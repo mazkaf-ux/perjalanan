@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurnal & Catatan Perjalanan</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #0f766e;
+            --accent-hover: #115e59;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #334155;
+            --muted: #64748b;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Layar Kunci */
+        #lock-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .lock-box {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .lock-box h2 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .lock-box p {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1.25rem;
+            text-align: center;
+            letter-spacing: 0.4rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .pin-input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Layout Utama */
+        #app-container {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 4rem;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Tombol */
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--danger);
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        /* Statistik Ringkas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card span {
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: block;
+        }
+
+        .stat-card strong {
+            font-size: 1.35rem;
+            color: var(--primary);
+        }
+
+        /* Form Input */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Filter & Pencarian */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        /* Daftar Perjalanan */
+        .trip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .trip-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .trip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .trip-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .trip-route {
+            font-size: 0.875rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-ongoing { background: #fef3c7; color: var(--warning); }
+        .badge-upcoming { background: #e0f2fe; color: #0284c7; }
+        .badge-done { background: #d1fae5; color: var(--success); }
+
+        .trip-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .trip-notes {
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            white-space: pre-line;
+            border: 1px dashed var(--border);
+        }
+
+        .trip-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--muted);
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LAYAR KUNCI -->
+    <div id="lock-screen">
+        <div class="lock-box">
+            <h2>Catatan Perjalanan</h2>
+            <p>Masukkan sandi akses untuk membuka log perjalanan.</p>
+            <input type="password" id="pin-field" class="pin-input" placeholder="••••••" maxlength="12" onkeyup="if(event.key==='Enter') checkPin()">
+            <button class="btn-primary" style="width: 100%;" onclick="checkPin()">Buka Catatan</button>
+            <p id="pin-error" style="color: var(--danger); margin-top: 0.75rem; margin-bottom: 0; display: none;">Sandi salah. Silakan coba lagi.</p>
+        </div>
+    </div>
+
+    <!-- APLIKASI UTAMA -->
+    <div id="app-container">
+        <header>
+            <div>
+                <h1>Log & Jurnal Perjalanan</h1>
+                <p style="font-size: 0.85rem; color: var(--muted);">Arsip rute, jadwal, agenda, dan rincian mobilitas</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" onclick="exportCSV()">Ekspor Excel (CSV)</button>
+                <button class="btn-outline" onclick="exportJSON()">Backup JSON</button>
+                <button class="btn-outline" onclick="document.getElementById('import-file').click()">Pulihkan</button>
+                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importJSON(event)">
+                <button class="btn-danger" onclick="lockApp()">Kunci</button>
+            </div>
+        </header>
+
+        <!-- Ringkasan Statistik -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Total Perjalanan</span>
+                <strong id="stat-total">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Sedang Berlangsung</span>
+                <strong id="stat-ongoing" style="color: var(--warning);">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Rencana Mendatang</span>
+                <strong id="stat-upcoming" style="color: #0284c7;">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Estimasi Total Biaya</span>
+                <strong id="stat-cost">Rp 0</strong>
+            </div>
+        </div>
+
+        <!-- Form Tambah Perjalanan -->
+        <div class="card">
+            <h3 id="form-title">Tambah Catatan Perjalanan Baru</h3>
+            <form id="trip-form" onsubmit="saveTrip(event)">
+                <input type="hidden" id="edit-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="origin">Kota / Titik Berangkat *</label>
+                        <input type="text" id="origin" placeholder="Contoh: Temanggung" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination">Kota / Lokasi Tujuan *</label>
+                        <input type="text" id="destination" placeholder="Contoh: Semarang / Wonosobo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date-start">Tanggal Berangkat *</label>
+                        <input type="date" id="date-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date-end">Tanggal Kembali / Selesai</label>
+                        <input type="date" id="date-end">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori / Keperluan *</label>
+                        <select id="category" required>
+                            <option value="Pekerjaan / Dinas">Pekerjaan / Dinas</option>
+                            <option value="Akademik / Kampus">Akademik / Kampus</option>
+                            <option value="Organisasi">Organisasi</option>
+                            <option value="Koperasi / Usaha">Koperasi / Usaha</option>
+                            <option value="Pribadi / Keluarga">Pribadi / Keluarga</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transport">Moda Transportasi</label>
+                        <input type="text" id="transport" placeholder="Contoh: Motor, Kereta Api, Bus">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status Perjalanan</label>
+                        <select id="status">
+                            <option value="ongoing">Sedang Berlangsung</option>
+                            <option value="upcoming">Rencana / Akan Datang</option>
+                            <option value="done">Selesai</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cost">Estimasi / Realisasi Biaya (Rp)</label>
+                        <input type="number" id="cost" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group full">
+                        <label for="agenda">Judul Agenda / Tujuan Spesifik *</label>
+                        <input type="text" id="agenda" placeholder="Contoh: Rapat Koordinasi Wilayah atau Kuliah S2" required>
+                    </div>
+                    <div class="form-group full">
+                        <label for="notes">Catatan Rinci (Rute, Penginapan, Kontak, atau Hal Penting)</label>
+                        <textarea id="notes" rows="3" placeholder="Tuliskan detail lokasi, titik temu, barang bawaan, atau evaluasi perjalanan..."></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
+                    <button type="submit" class="btn-primary" id="submit-btn">Simpan Catatan</button>
+                    <button type="button" class="btn-outline" id="cancel-btn" style="display: none;" onclick="resetForm()">Batal Edit</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filter & Daftar -->
+        <div class="filter-bar">
+            <input type="text" id="search-input" placeholder="Cari tujuan, agenda, atau catatan..." oninput="renderTrips()">
+            <select id="filter-status" onchange="renderTrips()">
+                <option value="all">Semua Status</option>
+                <option value="ongoing">Sedang Berlangsung</option>
+                <option value="upcoming">Rencana Mendatang</option>
+                <option value="done">Selesai</option>
+            </select>
+        </div>
+
+        <div id="trip-list" class="trip-list"></div>
+    </div>
+
+    <script>
+        // PENGATURAN SANDI (Ubah angka di bawah ini sesuai sandi yang Anda inginkan)
+        const ACCESS_PIN = "220403"; 
+        const STORAGE_KEY = "mazkaf_travel_logs_v1";
+
+        let trips = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        // Cek sesi login saat halaman dimuat
+        window.onload = function() {
+            if (sessionStorage.getItem("travel_unlocked") === "true") {
+                unlockUI();
+            }
+            document.getElementById('date-start').valueAsDate = new Date();
+        };
+
+        function checkPin() {
+            const input = document.getElementById("pin-field").value;
+            const errorMsg = document.getElementById("pin-error");
+            if (input === ACCESS_PIN) {
+                sessionStorage.setItem("travel_unlocked", "true");
+                errorMsg.style.display = "none";
+                unlockUI();
+            } else {
+                errorMsg.style.display = "block";
+                document.getElementById("pin-field").value = "";
+            }
+        }
+
+        function unlockUI() {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("app-container").style.display = "block";
+            renderTrips();
+        }
+
+        function lockApp() {
+            sessionStorage.removeItem("travel_unlocked");
+            document.getElementById("pin-field").value = "";
+            document.getElementById("app-container").style.display = "none";
+            document.getElementById("lock-screen").style.display = "flex";
+        }
+
+        function saveTrip(e) {
+            e.preventDefault();
+            const editId = document.getElementById("edit-id").value;
+            
+            const tripData = {
+                id: editId ? Number(editId) : Date.now(),
+                origin: document.getElementById("origin").value.trim(),
+                destination: document.getElementById("destination").value.trim(),
+                dateStart: document.getElementById("date-start").value,
+                dateEnd: document.getElementById("date-end").value,
+                category: document.getElementById("category").value,
+                transport: document.getElementById("transport").value.trim() || "-",
+                status: document.getElementById("status").value,
+                cost: Number(document.getElementById("cost").value) || 0,
+                agenda: document.getElementById("agenda").value.trim(),
+                notes: document.getElementById("notes").value.trim()
+            };
+
+            if (editId) {
+                const index = trips.findIndex(t => t.id === Number(editId));
+                if (index !== -1) trips[index] = tripData;
+            } else {
+                trips.unshift(tripData);
+            }
+
+            // Urutkan berdasarkan tanggal berangkat terbaru
+            trips.sort((a, b) => new Date(b.dateStart) - new Date(a.dateStart));
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+            resetForm();
+            renderTrips();
+        }
+
+        function editTrip(id) {
+            const trip = trips.find(t => t.id === id);
+            if (!trip) return;
+
+            document.getElementById("edit-id").value = trip.id;
+            document.getElementById("origin").value = trip.origin;
+            document.getElementById("destination").value = trip.destination;
+            document.getElementById("date-start").value = trip.dateStart;
+            document.getElementById("date-end").value = trip.dateEnd;
+            document.getElementById("category").value = trip.category;
+            document.getElementById("transport").value = trip.transport === "-" ? "" : trip.transport;
+            document.getElementById("status").value = trip.status;
+            document.getElementById("cost").value = trip.cost || "";
+            document.getElementById("agenda").value = trip.agenda;
+            document.getElementById("notes").value = trip.notes;
+
+            document.getElementById("form-title").innerText = "Edit Catatan Perjalanan";
+            document.getElementById("submit-btn").innerText = "Perbarui Catatan";
+            document.getElementById("cancel-btn").style.display = "inline-block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteTrip(id) {
+            if (confirm("Hapus catatan perjalanan ini secara permanen?")) {
+                trips = trips.filter(t => t.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+                renderTrips();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById("trip-form").reset();
+            document.getElementById("edit-id").value = "";
+            document.getElementById("date-start").valueAsDate = new Date();
+            document.getElementById("form-title").innerText = "Tambah Catatan Perjalanan Baru";
+            document.getElementById("submit-btn").innerText = "Simpan Catatan";
+            document.getElementById("cancel-btn").style.display = "none";
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return "";
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return new Date(dateStr).toLocaleDateString('id-ID', options);
+        }
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function renderTrips() {
+            const listEl = document.getElementById("trip-list");
+            const search = document.getElementById("search-input").value.toLowerCase();
+            const filterStatus = document.getElementById("filter-status").value;
+
+            // Update Statistik
+            document.getElementById("stat-total").innerText = trips.length;
+            document.getElementById("stat-ongoing").innerText = trips.filter(t => t.status === "ongoing").length;
+            document.getElementById("stat-upcoming").innerText = trips.filter(t => t.status === "upcoming").length;
+            const totalCost = trips.reduce((sum, t) => sum + (t.cost || 0), 0);
+            document.getElementById("stat-cost").innerText = formatRupiah(totalCost);
+
+            const filtered = trips.filter(t => {
+                const matchText = t.destination.toLowerCase().includes(search) ||
+                                  t.origin.toLowerCase().includes(search) ||
+                                  t.agenda.toLowerCase().includes(search) ||
+                                  t.notes.toLowerCase().includes(search);
+                const matchStatus = filterStatus === "all" || t.status === filterStatus;
+                return matchText && matchStatus;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="empty-state">Belum ada catatan perjalanan yang sesuai. Silakan tambahkan catatan baru di atas.</div>`;
+                return;
+            }
+
+            const statusLabels = {
+                ongoing: { text: "Sedang Berlangsung", class: "badge-ongoing" },
+                upcoming: { text: "Rencana Mendatang", class: "badge-upcoming" },
+                done: { text: "Selesai", class: "badge-done" }
+            };
+
+            listEl.innerHTML = filtered.map(t => {
+                const st = statusLabels[t.status] || statusLabels.done;
+                const dateRange = t.dateEnd && t.dateEnd !== t.dateStart 
+                    ? `${formatDate(t.dateStart)} – ${formatDate(t.dateEnd)}`
+                    : formatDate(t.dateStart);
+
+                return `
+                    <div class="trip-item">
+                        <div class="trip-header">
+                            <div>
+                                <div class="trip-route">${t.origin} → ${t.destination}</div>
+                                <div class="trip-title">${t.agenda}</div>
+                            </div>
+                            <span class="badge ${st.class}">${st.text}</span>
+                        </div>
+                        <div class="trip-meta">
+                            <span><strong>Tanggal:</strong> ${dateRange}</span>
+                            <span><strong>Kategori:</strong> ${t.category}</span>
+                            <span><strong>Transportasi:</strong> ${t.transport}</span>
+                            <span><strong>Biaya:</strong> ${formatRupiah(t.cost)}</span>
+                        </div>
+                        ${t.notes ? `<div class="trip-notes">${t.notes}</div>` : ''}
+                        <div class="trip-footer">
+                            <span style="font-size: 0.75rem; color: var(--muted);">ID: #${String(t.id).slice(-5)}</span>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-outline" style="padding: 0.35rem 0.7rem; font-size: 0.8rem;" onclick="editTrip(${t.id})">Edit</button>
+                                <button class="btn-danger" onclick="deleteTrip(${t.id})">Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trips, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `backup-perjalanan-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        trips = imported;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+                        renderTrips();
+                        alert("Data perjalanan berhasil dipulihkan!");
+                    }
+                } catch (err) {
+                    alert("Format file tidak valid.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportCSV() {
+            if (trips.length === 0) return alert("Belum ada data untuk diekspor.");
+            const headers = ["Tanggal Berangkat", "Tanggal Kembali", "Asal", "Tujuan", "Agenda", "Kategori", "Transportasi", "Status", "Biaya", "Catatan"];
+            const rows = trips.map(t => [
+                t.dateStart, t.dateEnd || t.dateStart, `"${t.origin}"`, `"${t.destination}"`,
+                `"${t.agenda.replace(/"/g, '""')}"`, `"${t.category}"`, `"${t.transport}"`,
+                t.status, t.cost, `"${t.notes.replace(/"/g, '""').replace(/\n/g, ' ')}"`
+            ]);
+            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+            const a = document.createElement("a");
+            a.setAttribute("href", encodeURI(csvContent));
+            a.setAttribute("download", `rekap-perjalanan-${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+    </script>
+</body>
+</html>
