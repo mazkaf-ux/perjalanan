@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jurnal & Catatan Perjalanan</title>
+    <title>Jurnal & Catatan Perjalanan (Cloud Sync)</title>
     <style>
         :root {
             --primary: #1e293b;
@@ -78,9 +78,7 @@
             outline: none;
         }
 
-        .pin-input:focus {
-            border-color: var(--accent);
-        }
+        .pin-input:focus { border-color: var(--accent); }
 
         /* Layout Utama */
         #app-container {
@@ -101,18 +99,31 @@
             margin-bottom: 1.5rem;
         }
 
-        header h1 {
-            font-size: 1.5rem;
-            color: var(--primary);
+        header h1 { font-size: 1.5rem; color: var(--primary); }
+
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: var(--text);
+            margin-top: 0.25rem;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--warning);
         }
 
-        /* Tombol */
+        .sync-online .sync-dot { background: var(--success); }
+
+        .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
         button {
             cursor: pointer;
             border: none;
@@ -123,37 +134,14 @@
             transition: background 0.2s;
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-danger { background: #fee2e2; color: var(--danger); padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+        .btn-danger:hover { background: #fecaca; }
 
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-outline {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-
-        .btn-danger {
-            background: #fee2e2;
-            color: var(--danger);
-            padding: 0.4rem 0.75rem;
-            font-size: 0.8rem;
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
-        }
-
-        /* Statistik Ringkas */
+        /* Statistik */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -168,16 +156,8 @@
             border: 1px solid var(--border);
         }
 
-        .stat-card span {
-            font-size: 0.8rem;
-            color: var(--muted);
-            display: block;
-        }
-
-        .stat-card strong {
-            font-size: 1.35rem;
-            color: var(--primary);
-        }
+        .stat-card span { font-size: 0.8rem; color: var(--muted); display: block; }
+        .stat-card strong { font-size: 1.35rem; color: var(--primary); }
 
         /* Form Input */
         .card {
@@ -188,11 +168,7 @@
             margin-bottom: 1.5rem;
         }
 
-        .card h3 {
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            color: var(--primary);
-        }
+        .card h3 { margin-bottom: 1rem; font-size: 1.1rem; color: var(--primary); }
 
         .form-grid {
             display: grid;
@@ -200,21 +176,10 @@
             gap: 1rem;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .form-group.full { grid-column: 1 / -1; }
 
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-size: 0.825rem;
-            font-weight: 600;
-            color: var(--text);
-        }
+        label { font-size: 0.825rem; font-weight: 600; color: var(--text); }
 
         input, select, textarea {
             padding: 0.6rem 0.75rem;
@@ -225,30 +190,13 @@
             background: white;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
 
-        /* Filter & Pencarian */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
+        /* Filter & List */
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+        .filter-bar input { flex: 1; min-width: 220px; }
 
-        .filter-bar input {
-            flex: 1;
-            min-width: 220px;
-        }
-
-        /* Daftar Perjalanan */
-        .trip-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .trip-list { display: flex; flex-direction: column; gap: 1rem; }
 
         .trip-item {
             background: var(--card);
@@ -269,36 +217,15 @@
             gap: 0.5rem;
         }
 
-        .trip-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
+        .trip-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .trip-route { font-size: 0.875rem; color: var(--accent); font-weight: 600; }
 
-        .trip-route {
-            font-size: 0.875rem;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .badge {
-            padding: 0.25rem 0.6rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
+        .badge { padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
         .badge-ongoing { background: #fef3c7; color: var(--warning); }
         .badge-upcoming { background: #e0f2fe; color: #0284c7; }
         .badge-done { background: #d1fae5; color: var(--success); }
 
-        .trip-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
+        .trip-meta { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: var(--muted); }
 
         .trip-notes {
             background: #f8fafc;
@@ -333,7 +260,7 @@
     <div id="lock-screen">
         <div class="lock-box">
             <h2>Catatan Perjalanan</h2>
-            <p>Masukkan sandi akses untuk membuka log perjalanan.</p>
+            <p>Masukkan sandi akses untuk membuka sinkronisasi perjalanan.</p>
             <input type="password" id="pin-field" class="pin-input" placeholder="••••••" maxlength="12" onkeyup="if(event.key==='Enter') checkPin()">
             <button class="btn-primary" style="width: 100%;" onclick="checkPin()">Buka Catatan</button>
             <p id="pin-error" style="color: var(--danger); margin-top: 0.75rem; margin-bottom: 0; display: none;">Sandi salah. Silakan coba lagi.</p>
@@ -345,18 +272,19 @@
         <header>
             <div>
                 <h1>Log & Jurnal Perjalanan</h1>
-                <p style="font-size: 0.85rem; color: var(--muted);">Arsip rute, jadwal, agenda, dan rincian mobilitas</p>
+                <div id="sync-indicator" class="sync-badge">
+                    <span class="sync-dot"></span>
+                    <span id="sync-text">Menghubungkan ke Cloud...</span>
+                </div>
             </div>
             <div class="header-actions">
                 <button class="btn-outline" onclick="exportCSV()">Ekspor Excel (CSV)</button>
                 <button class="btn-outline" onclick="exportJSON()">Backup JSON</button>
-                <button class="btn-outline" onclick="document.getElementById('import-file').click()">Pulihkan</button>
-                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importJSON(event)">
                 <button class="btn-danger" onclick="lockApp()">Kunci</button>
             </div>
         </header>
 
-        <!-- Ringkasan Statistik -->
+        <!-- Statistik Ringkas -->
         <div class="stats-grid">
             <div class="stat-card">
                 <span>Total Perjalanan</span>
@@ -376,7 +304,7 @@
             </div>
         </div>
 
-        <!-- Form Tambah Perjalanan -->
+        <!-- Form Input -->
         <div class="card">
             <h3 id="form-title">Tambah Catatan Perjalanan Baru</h3>
             <form id="trip-form" onsubmit="saveTrip(event)">
@@ -434,7 +362,7 @@
                     </div>
                 </div>
                 <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
-                    <button type="submit" class="btn-primary" id="submit-btn">Simpan Catatan</button>
+                    <button type="submit" class="btn-primary" id="submit-btn">Simpan ke Cloud</button>
                     <button type="button" class="btn-outline" id="cancel-btn" style="display: none;" onclick="resetForm()">Batal Edit</button>
                 </div>
             </form>
@@ -451,17 +379,36 @@
             </select>
         </div>
 
-        <div id="trip-list" class="trip-list"></div>
+        <div id="trip-list" class="trip-list">
+            <div class="empty-state">Memuat data dari server Firebase...</div>
+        </div>
     </div>
 
+    <!-- Firebase SDK (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
     <script>
-        // PENGATURAN SANDI (Ubah angka di bawah ini sesuai sandi yang Anda inginkan)
-        const ACCESS_PIN = "220403"; 
-        const STORAGE_KEY = "mazkaf_travel_logs_v1";
+        const ACCESS_PIN = "220403";
 
-        let trips = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQ-SJGclLjdvtUfrWQF5gV1bZ1UjN0whA",
+            authDomain: "perjalanan-939a6.firebaseapp.com",
+            databaseURL: "https://perjalanan-939a6-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "perjalanan-939a6",
+            storageBucket: "perjalanan-939a6.firebasestorage.app",
+            messagingSenderId: "44845693119",
+            appId: "1:44845693119:web:420f85734a46cf83dc2e0a"
+        };
 
-        // Cek sesi login saat halaman dimuat
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const tripsRef = db.ref("perjalanan_pribadi");
+
+        let trips = [];
+
         window.onload = function() {
             if (sessionStorage.getItem("travel_unlocked") === "true") {
                 unlockUI();
@@ -485,7 +432,7 @@
         function unlockUI() {
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-container").style.display = "block";
-            renderTrips();
+            connectCloud();
         }
 
         function lockApp() {
@@ -495,12 +442,38 @@
             document.getElementById("lock-screen").style.display = "flex";
         }
 
+        function connectCloud() {
+            const indicator = document.getElementById("sync-indicator");
+            const syncText = document.getElementById("sync-text");
+
+            auth.signInAnonymously()
+                .then(() => {
+                    indicator.classList.add("sync-online");
+                    syncText.innerText = "Tersinkronisasi (Cloud Aktif)";
+
+                    tripsRef.on("value", (snapshot) => {
+                        const data = snapshot.val();
+                        trips = data ? Object.values(data) : [];
+                        trips.sort((a, b) => new Date(b.dateStart) - new Date(a.dateStart));
+                        renderTrips();
+                    }, (error) => {
+                        syncText.innerText = "Akses ditolak: Pastikan Rules & Auth Anonymous aktif";
+                        console.error("Database Read Error:", error);
+                    });
+                })
+                .catch((error) => {
+                    syncText.innerText = "Gagal login ke Cloud: Aktifkan Anonymous Auth";
+                    console.error("Firebase Auth Error:", error);
+                });
+        }
+
         function saveTrip(e) {
             e.preventDefault();
             const editId = document.getElementById("edit-id").value;
+            const tripId = editId ? String(editId) : String(Date.now());
             
             const tripData = {
-                id: editId ? Number(editId) : Date.now(),
+                id: tripId,
                 origin: document.getElementById("origin").value.trim(),
                 destination: document.getElementById("destination").value.trim(),
                 dateStart: document.getElementById("date-start").value,
@@ -513,48 +486,40 @@
                 notes: document.getElementById("notes").value.trim()
             };
 
-            if (editId) {
-                const index = trips.findIndex(t => t.id === Number(editId));
-                if (index !== -1) trips[index] = tripData;
-            } else {
-                trips.unshift(tripData);
-            }
-
-            // Urutkan berdasarkan tanggal berangkat terbaru
-            trips.sort((a, b) => new Date(b.dateStart) - new Date(a.dateStart));
-
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
-            resetForm();
-            renderTrips();
+            tripsRef.child(tripId).set(tripData)
+                .then(() => {
+                    resetForm();
+                })
+                .catch((err) => {
+                    alert("Gagal menyimpan ke cloud: " + err.message);
+                });
         }
 
         function editTrip(id) {
-            const trip = trips.find(t => t.id === id);
+            const trip = trips.find(t => String(t.id) === String(id));
             if (!trip) return;
 
             document.getElementById("edit-id").value = trip.id;
             document.getElementById("origin").value = trip.origin;
             document.getElementById("destination").value = trip.destination;
             document.getElementById("date-start").value = trip.dateStart;
-            document.getElementById("date-end").value = trip.dateEnd;
+            document.getElementById("date-end").value = trip.dateEnd || "";
             document.getElementById("category").value = trip.category;
             document.getElementById("transport").value = trip.transport === "-" ? "" : trip.transport;
             document.getElementById("status").value = trip.status;
             document.getElementById("cost").value = trip.cost || "";
             document.getElementById("agenda").value = trip.agenda;
-            document.getElementById("notes").value = trip.notes;
+            document.getElementById("notes").value = trip.notes || "";
 
             document.getElementById("form-title").innerText = "Edit Catatan Perjalanan";
-            document.getElementById("submit-btn").innerText = "Perbarui Catatan";
+            document.getElementById("submit-btn").innerText = "Perbarui di Cloud";
             document.getElementById("cancel-btn").style.display = "inline-block";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function deleteTrip(id) {
-            if (confirm("Hapus catatan perjalanan ini secara permanen?")) {
-                trips = trips.filter(t => t.id !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
-                renderTrips();
+            if (confirm("Hapus catatan perjalanan ini dari semua perangkat?")) {
+                tripsRef.child(String(id)).remove();
             }
         }
 
@@ -563,7 +528,7 @@
             document.getElementById("edit-id").value = "";
             document.getElementById("date-start").valueAsDate = new Date();
             document.getElementById("form-title").innerText = "Tambah Catatan Perjalanan Baru";
-            document.getElementById("submit-btn").innerText = "Simpan Catatan";
+            document.getElementById("submit-btn").innerText = "Simpan ke Cloud";
             document.getElementById("cancel-btn").style.display = "none";
         }
 
@@ -582,7 +547,6 @@
             const search = document.getElementById("search-input").value.toLowerCase();
             const filterStatus = document.getElementById("filter-status").value;
 
-            // Update Statistik
             document.getElementById("stat-total").innerText = trips.length;
             document.getElementById("stat-ongoing").innerText = trips.filter(t => t.status === "ongoing").length;
             document.getElementById("stat-upcoming").innerText = trips.filter(t => t.status === "upcoming").length;
@@ -590,16 +554,16 @@
             document.getElementById("stat-cost").innerText = formatRupiah(totalCost);
 
             const filtered = trips.filter(t => {
-                const matchText = t.destination.toLowerCase().includes(search) ||
-                                  t.origin.toLowerCase().includes(search) ||
-                                  t.agenda.toLowerCase().includes(search) ||
-                                  t.notes.toLowerCase().includes(search);
+                const matchText = (t.destination || "").toLowerCase().includes(search) ||
+                                  (t.origin || "").toLowerCase().includes(search) ||
+                                  (t.agenda || "").toLowerCase().includes(search) ||
+                                  (t.notes || "").toLowerCase().includes(search);
                 const matchStatus = filterStatus === "all" || t.status === filterStatus;
                 return matchText && matchStatus;
             });
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="empty-state">Belum ada catatan perjalanan yang sesuai. Silakan tambahkan catatan baru di atas.</div>`;
+                listEl.innerHTML = `<div class="empty-state">Belum ada catatan perjalanan. Data yang Anda simpan akan otomatis muncul di semua perangkat.</div>`;
                 return;
             }
 
@@ -634,8 +598,8 @@
                         <div class="trip-footer">
                             <span style="font-size: 0.75rem; color: var(--muted);">ID: #${String(t.id).slice(-5)}</span>
                             <div style="display: flex; gap: 0.5rem;">
-                                <button class="btn-outline" style="padding: 0.35rem 0.7rem; font-size: 0.8rem;" onclick="editTrip(${t.id})">Edit</button>
-                                <button class="btn-danger" onclick="deleteTrip(${t.id})">Hapus</button>
+                                <button class="btn-outline" style="padding: 0.35rem 0.7rem; font-size: 0.8rem;" onclick="editTrip('${t.id}')">Edit</button>
+                                <button class="btn-danger" onclick="deleteTrip('${t.id}')">Hapus</button>
                             </div>
                         </div>
                     </div>
@@ -653,33 +617,13 @@
             a.remove();
         }
 
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        trips = imported;
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
-                        renderTrips();
-                        alert("Data perjalanan berhasil dipulihkan!");
-                    }
-                } catch (err) {
-                    alert("Format file tidak valid.");
-                }
-            };
-            reader.readAsText(file);
-        }
-
         function exportCSV() {
             if (trips.length === 0) return alert("Belum ada data untuk diekspor.");
             const headers = ["Tanggal Berangkat", "Tanggal Kembali", "Asal", "Tujuan", "Agenda", "Kategori", "Transportasi", "Status", "Biaya", "Catatan"];
             const rows = trips.map(t => [
                 t.dateStart, t.dateEnd || t.dateStart, `"${t.origin}"`, `"${t.destination}"`,
-                `"${t.agenda.replace(/"/g, '""')}"`, `"${t.category}"`, `"${t.transport}"`,
-                t.status, t.cost, `"${t.notes.replace(/"/g, '""').replace(/\n/g, ' ')}"`
+                `"${(t.agenda || "").replace(/"/g, '""')}"`, `"${t.category}"`, `"${t.transport}"`,
+                t.status, t.cost, `"${(t.notes || "").replace(/"/g, '""').replace(/\n/g, ' ')}"`
             ]);
             const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
             const a = document.createElement("a");
